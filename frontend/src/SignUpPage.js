@@ -64,8 +64,8 @@ function SignUpPage(){
                         },
                     body: JSON.stringify(data,null,2),})
                     .then(data => data.json())
-                    .then(respnse => {
-                        console.log(respnse)
+                    .then(response => {
+                        console.log(response)
                         toast({
                             title: 'Account created.',
                             description: "創建帳號成功",

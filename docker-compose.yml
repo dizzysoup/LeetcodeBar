@@ -1,14 +1,52 @@
-version: "3"
+version: '3'
+
 services:
- frontend:
-    container_name: frontend
-    restart: always
-    build:
-      context: .
-      dockerfile: Dockerfile
+  database:
+    image: mariadb
+    container_name : mariadb 
+    restart : always 
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: CRDB
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
     volumes:
-      - ./frontend:/frontend
-    command: sh -c "cd react-sample && yarn start"
+      - ./database/CRDB.sql:/docker-entrypoint-initdb.d/CRDB.sql # 映射data.sql到容器內部初始化目錄
+    networks:
+      - my-network
+
+  backend:
+    container_name : backend
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/backend
+    networks:
+      - my-network
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: always
+    depends_on:
+      - database
+
+  frontend:
+    container_name : frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile-frontend
     ports:
       - "3000:3000"
-    stdin_open: true
+    networks:
+      - my-network
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/frontend
+      - ./frontend/node_modules:/frontend/node_modules
+
+
+networks:
+  my-network:
+    driver: bridge

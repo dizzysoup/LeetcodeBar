@@ -1,5 +1,4 @@
-# docker-entrypoint.sh
-#!/bin/bash
+#!/bin/bash -x 
 
 # Collect static files
 echo "Collect static files"
